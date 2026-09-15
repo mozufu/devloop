@@ -1,0 +1,12 @@
+{
+  formatVersion = 1;
+  name = "devloop_helpers";
+  compilerCompatibility = "0.1.0";
+  modules = [
+    { name = "validate"; path = "validate.zt"; };
+  ];
+  dependencies = [
+    { alias = "dev_spec"; path = "../../contracts/dev-spec/v1"; };
+    { alias = "execution"; path = "../../contracts/execution/v1"; };
+  ];
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "devloop-policy/v1",
+  "bodyProfile": "fenced-zti/v1",
+  "codePaths": ["queue.py", "queue_gate.py", "approval.py"],
+  "approvalArgv": ["python3", "approval.py"],
+  "gates": [
+    {
+      "id": "queue",
+      "mode": "automated",
+      "argv": ["python3", "queue_gate.py"],
+      "ttlSeconds": 3600,
+      "observations": [{"id": "depth", "kind": "int"}]
+    }
+  ]
+}

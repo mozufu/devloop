@@ -1,0 +1,7 @@
+s ::= import dev_spec.schema;
+Declaration :: type { id : Text; kind : Text; };
+Gate :: type { id : Text; mode : Text; observations : List Declaration; };
+Identity :: type { requirements : Text; code : Text; policy : Text; inputs : Text; target : Text; image : Text; helper : Text; epoch : Text; };
+Evidence :: type { acceptance : Text; gate : Text; mode : Text; identity : Identity; observedAt : Int; expiresAt : Int; passed : Bool; observer : Text; observations : List s.Observation; };
+Execution :: type { identity : Identity; now : Int; ready : Bool; approved : Bool; gates : List Gate; evidence : List Evidence; };
+{ Declaration =; Gate =; Identity =; Evidence =; Execution =; }

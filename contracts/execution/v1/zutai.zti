@@ -1,0 +1,12 @@
+{
+  formatVersion = 1;
+  name = "devloop_execution";
+  compilerCompatibility = "0.1.0";
+  modules = [
+    { name = "schema"; path = "schema.zt"; };
+    { name = "policy"; path = "policy.zt"; };
+  ];
+  dependencies = [
+    { alias = "dev_spec"; path = "../../dev-spec/v1"; };
+  ];
+}

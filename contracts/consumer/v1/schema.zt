@@ -1,0 +1,3 @@
+e ::= import execution.schema;
+Consumer :: type { recordSchema : Text; schema : Text; bodyProfile : Text; helper : Text; requirementsDigest : Text; admission : Text; epoch : Text; evidence : List e.Evidence; };
+{ Consumer =; }

@@ -1,0 +1,4 @@
+Declaration :: type { id : Text; kind : Text; };
+Gate :: type { id : Text; mode : Text; argv : List Text; ttlSeconds : Int; observations : List Declaration; };
+Policy :: type { schema : Text; bodyProfile : Text; codePaths : List Text; gates : List Gate; approvalArgv : List Text; };
+{ Declaration =; Gate =; Policy =; }

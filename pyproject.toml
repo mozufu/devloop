@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devloop"
+version = "0.1.0"
+description = "UUID-bound Zutai requirements and evidence for MyQue"
+requires-python = ">=3.11"
+dependencies = ["PyYAML>=6.0,<7"]
+license = {text = "BSD-3-Clause"}
+
+[project.scripts]
+devloop = "devloop.cli:main"
+
+[tool.setuptools]
+packages = ["devloop"]
+
+[tool.setuptools.package-data]
+devloop = ["bindings.json"]
+
+[tool.setuptools.data-files]
+"share/devloop/contracts/dev-spec/v1" = ["contracts/dev-spec/v1/schema.zt", "contracts/dev-spec/v1/zutai.zti"]
+"share/devloop/contracts/execution/v1" = ["contracts/execution/v1/schema.zt", "contracts/execution/v1/policy.zt", "contracts/execution/v1/zutai.zti"]
+"share/devloop/contracts/consumer/v1" = ["contracts/consumer/v1/schema.zt", "contracts/consumer/v1/zutai.zti"]
+"share/devloop/helpers/v1" = ["helpers/v1/validate.zt", "helpers/v1/zutai.zti"]
+"share/devloop/skills/devloop" = ["skills/devloop/SKILL.md"]

@@ -1,0 +1,12 @@
+[package]
+name = "devloop-zutai"
+version = "0.1.0"
+edition = "2024"
+license = "BSD-3-Clause"
+description = "Atom-preserving admission and inert decoding for devloop"
+repository = "https://github.com/iceice666/devloop"
+
+[dependencies]
+zutai-eval = { git = "https://github.com/iceice666/zutai", rev = "9026fcff5f12e7b2377c25b3d389c2eb06d98e5a" }
+zutai-im = { git = "https://github.com/iceice666/zutai", rev = "9026fcff5f12e7b2377c25b3d389c2eb06d98e5a", features = ["syntax"] }
+serde_json = "1"

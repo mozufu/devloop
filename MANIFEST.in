@@ -1,0 +1,9 @@
+include LICENSE README.md Cargo.toml Cargo.lock
+recursive-include src *.rs
+recursive-include contracts *.zt *.zti
+recursive-include helpers *.zt *.zti
+recursive-include skills *.md
+recursive-include examples *.zti *.json
+recursive-include tools *.py
+recursive-include tests *.py
+include devloop/bindings.json

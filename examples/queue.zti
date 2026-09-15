@@ -1,0 +1,41 @@
+{
+  acceptance = [
+    {
+      gate = "queue";
+      id = "A1";
+      mandatory = true;
+      mode = "automated";
+      predicate = "P1";
+      rationale = "Measure the actual configured queue bound";
+    };
+  ];
+  nonGoals = [ "Changing scheduling"; ];
+  predicates = [
+    {
+      expected = {
+        boolValue = false;
+        intValue = 0;
+        kind = "int";
+        textValue = "";
+      };
+      id = "P1";
+      kind = "bounds";
+      lower = 1;
+      lowerInclusive = true;
+      members = [];
+      observation = "depth";
+      upper = 64;
+      upperInclusive = true;
+    };
+  ];
+  problem = "Queue growth must be bounded";
+  requirements = [
+    {
+      acceptance = [ "A1"; ];
+      id = "R1";
+      statement = "Queue depth is in the inclusive range 1 through 64";
+    };
+  ];
+  schema = "dev-spec/v1";
+  scope = [ "Queue capacity"; ];
+}

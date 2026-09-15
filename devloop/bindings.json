@@ -1,0 +1,435 @@
+{
+  "consumer": {
+    "Consumer": [
+      {
+        "name": "recordSchema",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "schema",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "bodyProfile",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "helper",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "requirementsDigest",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "admission",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "epoch",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "evidence",
+        "optional": false,
+        "type": "[record]"
+      }
+    ]
+  },
+  "execution": {
+    "Declaration": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "Text"
+      }
+    ],
+    "Evidence": [
+      {
+        "name": "acceptance",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "gate",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "mode",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "identity",
+        "optional": false,
+        "type": "Identity"
+      },
+      {
+        "name": "observedAt",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "expiresAt",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "passed",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "observer",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "type": "[record]"
+      }
+    ],
+    "Execution": [
+      {
+        "name": "identity",
+        "optional": false,
+        "type": "Identity"
+      },
+      {
+        "name": "now",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "ready",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "approved",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "gates",
+        "optional": false,
+        "type": "[Gate]"
+      },
+      {
+        "name": "evidence",
+        "optional": false,
+        "type": "[Evidence]"
+      }
+    ],
+    "Gate": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "mode",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "type": "[Declaration]"
+      }
+    ],
+    "Identity": [
+      {
+        "name": "requirements",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "code",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "policy",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "inputs",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "target",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "image",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "helper",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "epoch",
+        "optional": false,
+        "type": "Text"
+      }
+    ]
+  },
+  "policy": {
+    "Declaration": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "Text"
+      }
+    ],
+    "Gate": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "mode",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "argv",
+        "optional": false,
+        "type": "[Text]"
+      },
+      {
+        "name": "ttlSeconds",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "observations",
+        "optional": false,
+        "type": "[Declaration]"
+      }
+    ],
+    "Policy": [
+      {
+        "name": "schema",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "bodyProfile",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "codePaths",
+        "optional": false,
+        "type": "[Text]"
+      },
+      {
+        "name": "gates",
+        "optional": false,
+        "type": "[Gate]"
+      },
+      {
+        "name": "approvalArgv",
+        "optional": false,
+        "type": "[Text]"
+      }
+    ]
+  },
+  "spec": {
+    "Acceptance": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "rationale",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "gate",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "mode",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "mandatory",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "predicate",
+        "optional": false,
+        "type": "Text"
+      }
+    ],
+    "Observation": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "value",
+        "optional": false,
+        "type": "Value"
+      }
+    ],
+    "Predicate": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "observation",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "expected",
+        "optional": false,
+        "type": "Value"
+      },
+      {
+        "name": "lower",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "upper",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "lowerInclusive",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "upperInclusive",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "members",
+        "optional": false,
+        "type": "[Text]"
+      }
+    ],
+    "Requirement": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "statement",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "acceptance",
+        "optional": false,
+        "type": "[Text]"
+      }
+    ],
+    "Spec": [
+      {
+        "name": "schema",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "problem",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "scope",
+        "optional": false,
+        "type": "[Text]"
+      },
+      {
+        "name": "nonGoals",
+        "optional": false,
+        "type": "[Text]"
+      },
+      {
+        "name": "requirements",
+        "optional": false,
+        "type": "[Requirement]"
+      },
+      {
+        "name": "predicates",
+        "optional": false,
+        "type": "[Predicate]"
+      },
+      {
+        "name": "acceptance",
+        "optional": false,
+        "type": "[Acceptance]"
+      }
+    ],
+    "Value": [
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "Text"
+      },
+      {
+        "name": "intValue",
+        "optional": false,
+        "type": "Int"
+      },
+      {
+        "name": "boolValue",
+        "optional": false,
+        "type": "Bool"
+      },
+      {
+        "name": "textValue",
+        "optional": false,
+        "type": "Text"
+      }
+    ]
+  }
+}

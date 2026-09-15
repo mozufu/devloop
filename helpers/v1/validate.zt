@@ -1,0 +1,174 @@
+-- The single implementation of devloop's requirement, gate and evidence
+-- semantics. Host tools compile and apply these functions; they never restate
+-- a rule. Field access needs a typed receiver, so every predicate over a
+-- schema record is a named typed function rather than an inline lambda.
+s ::= import dev_spec.schema;
+e ::= import execution.schema;
+l ::= import stdlib.list;
+v ::= import stdlib.validate;
+t ::= import stdlib.text;
+
+issue :: Text -> Bool -> List Text
+  = location ok => match v.toResult (v.satisfy location location (\x. x) ok) { | #ok { value = _; } => l.empty (); | #err { error = _; } => { location; }; };
+has :: Text -> List Text -> Bool = id ids => l.any (\x. x == id) ids;
+unique :: List Text -> Bool = ids => l.all (\id. id != "" && l.countBy (\x. x == id) ids == 1) ids;
+
+predicateId :: s.Predicate -> Text = p => p.id;
+observationId :: s.Observation -> Text = o => o.id;
+requirementId :: s.Requirement -> Text = req => req.id;
+acceptanceId :: s.Acceptance -> Text = a => a.id;
+gateId :: e.Gate -> Text = gate => gate.id;
+declarationId :: e.Declaration -> Text = d => d.id;
+
+predicateNamed :: Text -> s.Predicate -> Bool = id p => p.id == id;
+observationNamed :: Text -> s.Observation -> Bool = id o => o.id == id;
+declarationMatches :: Text -> Text -> e.Declaration -> Bool
+  = id kind d => d.id == id && d.kind == kind;
+declarationKindKnown :: e.Declaration -> Bool = d => has d.kind { "int"; "bool"; "text"; };
+
+findPredicate :: Text -> List s.Predicate -> Optional s.Predicate
+  = id ps => l.find (predicateNamed id) ps;
+findObservation :: Text -> List s.Observation -> Optional s.Observation
+  = id os => l.find (observationNamed id) os;
+
+valueValid :: s.Value -> Bool = x => has x.kind { "int"; "bool"; "text"; };
+equal :: s.Value -> s.Value -> Bool
+  = a b => a.kind == b.kind && cond { a.kind == "int" => a.intValue == b.intValue; a.kind == "bool" => a.boolValue == b.boolValue; a.kind == "text" => a.textValue == b.textValue; _ => false; };
+withinBounds :: s.Predicate -> s.Value -> Bool
+  = p value => (value.kind == "int"
+    && (value.intValue > p.lower || (p.lowerInclusive && value.intValue == p.lower))
+    && (value.intValue < p.upper || (p.upperInclusive && value.intValue == p.upper)));
+
+-- A group's members must all name declared predicates; an atom carries none.
+predicateShape :: s.Predicate -> List s.Predicate -> Bool
+  = p ps => cond {
+    p.kind == "equal" => p.observation != "" && valueValid p.expected && l.length p.members == 0;
+    p.kind == "bounds" => p.observation != "" && p.lower <= p.upper && (p.lower != p.upper || (p.lowerInclusive && p.upperInclusive)) && l.length p.members == 0;
+    p.kind == "all" || p.kind == "any" => l.length p.members > 0 && unique p.members && l.all (\id. has id (l.map predicateId ps)) p.members;
+    _ => false;
+  };
+
+-- Fuel bounds the group nesting a payload may declare, so a cyclic or
+-- unresolvable reference fails instead of diverging.
+acyclic :: Int -> Text -> List s.Predicate -> Bool
+  = fuel id ps => fuel > 0 && match findPredicate id ps {
+    | #none => false;
+    | #some (p) => l.all (\child. acyclic (fuel - 1) child ps) p.members;
+  };
+
+observe :: Int -> Text -> List s.Predicate -> List s.Observation -> Bool
+  = fuel id ps os => fuel > 0 && match findPredicate id ps {
+    | #none => false;
+    | #some (p) => cond {
+      p.kind == "all" => l.length p.members > 0 && l.all (\child. observe (fuel - 1) child ps os) p.members;
+      p.kind == "any" => l.length p.members > 0 && l.any (\child. observe (fuel - 1) child ps os) p.members;
+      _ => match findObservation p.observation os {
+        | #none => false;
+        | #some (o) => cond {
+          p.kind == "equal" => equal p.expected o.value;
+          p.kind == "bounds" => withinBounds p o.value;
+          _ => false;
+        };
+      };
+    };
+  };
+
+compatible :: Int -> Text -> List s.Predicate -> List s.Observation -> Bool
+  = fuel id ps os => fuel > 0 && match findPredicate id ps {
+    | #none => false;
+    | #some (p) => cond {
+      p.kind == "all" || p.kind == "any" => l.length p.members > 0 && l.all (\child. compatible (fuel - 1) child ps os) p.members;
+      _ => match findObservation p.observation os {
+        | #none => false;
+        | #some (o) => valueValid o.value && cond {
+          p.kind == "equal" => o.value.kind == p.expected.kind;
+          p.kind == "bounds" => o.value.kind == "int";
+          _ => false;
+        };
+      };
+    };
+  };
+
+-- Consumer policy must declare a typed output for every observation a
+-- predicate reads; an undeclared observation is an unresolved gate.
+declared :: Int -> Text -> List s.Predicate -> List e.Declaration -> Bool
+  = fuel id ps declarations => fuel > 0 && match findPredicate id ps {
+    | #none => false;
+    | #some (p) => cond {
+      p.kind == "all" || p.kind == "any" => l.length p.members > 0 && l.all (\child. declared (fuel - 1) child ps declarations) p.members;
+      _ => l.any (declarationMatches p.observation (if p.kind == "bounds" then "int" else p.expected.kind)) declarations;
+    };
+  };
+
+coverage :: s.Spec -> s.Requirement -> List Text
+  = spec req => (issue (t.join "" { "E_COVERAGE:"; req.id; })
+    (req.statement != "" && l.length req.acceptance > 0 && unique req.acceptance && l.all (\id. has id (l.map acceptanceId spec.acceptance)) req.acceptance));
+predicateIssue :: s.Spec -> s.Predicate -> List Text
+  = spec p => (issue (t.join "" { "E_PREDICATE:"; p.id; })
+    (predicateShape p spec.predicates && acyclic (l.length spec.predicates + 1) p.id spec.predicates));
+obligationIssue :: s.Spec -> s.Acceptance -> List Text
+  = spec a => (issue (t.join "" { "E_OBLIGATION:"; a.id; })
+    (has a.mode { "automated"; "human"; } && a.gate != "" && has a.predicate (l.map predicateId spec.predicates)));
+
+projection :: s.Spec -> List Text
+  = spec => l.flatten {
+    issue "E_SCHEMA" (spec.schema == "dev-spec/v1");
+    issue "E_PROBLEM" (spec.problem != "" && l.length spec.scope > 0);
+    issue "E_REQUIREMENT_IDS" (l.length spec.requirements > 0 && unique (l.map requirementId spec.requirements));
+    issue "E_ACCEPTANCE_IDS" (l.length spec.acceptance > 0 && unique (l.map acceptanceId spec.acceptance));
+    issue "E_PREDICATE_IDS" (unique (l.map predicateId spec.predicates));
+    l.flatten (l.map (coverage spec) spec.requirements);
+    l.flatten (l.map (predicateIssue spec) spec.predicates);
+    l.flatten (l.map (obligationIssue spec) spec.acceptance);
+  };
+
+gateResolves :: s.Spec -> s.Acceptance -> e.Gate -> Bool
+  = spec a gate => (gate.id == a.gate && gate.mode == a.mode
+    && unique (l.map declarationId gate.observations)
+    && l.all declarationKindKnown gate.observations
+    && declared (l.length spec.predicates + 1) a.predicate spec.predicates gate.observations);
+gateIssue :: s.Spec -> List e.Gate -> s.Acceptance -> List Text
+  = spec gates a => issue (t.join "" { "E_GATE:"; a.id; }) (l.any (gateResolves spec a) gates);
+
+structure :: s.Spec -> List e.Gate -> List Text
+  = spec gates => l.flatten {
+    projection spec;
+    issue "E_GATE_IDS" (unique (l.map gateId gates));
+    l.flatten (l.map (gateIssue spec gates) spec.acceptance);
+  };
+
+identityEqual :: e.Identity -> e.Identity -> Bool
+  = a b => a.requirements == b.requirements && a.code == b.code && a.policy == b.policy && a.inputs == b.inputs && a.target == b.target && a.image == b.image && a.helper == b.helper && a.epoch == b.epoch;
+
+-- Evidence proves one acceptance obligation only when it was produced for the
+-- exact requirements, helpers, code, policy, execution inputs and run epoch in
+-- force now, has not expired, and its observations satisfy the predicate.
+bound :: s.Spec -> e.Execution -> s.Acceptance -> e.Evidence -> Bool
+  = spec execution a evidence => (evidence.acceptance == a.id && evidence.gate == a.gate && evidence.mode == a.mode && evidence.observer != "" && evidence.passed
+    && identityEqual evidence.identity execution.identity
+    && evidence.observedAt <= execution.now && execution.now < evidence.expiresAt && evidence.observedAt < evidence.expiresAt
+    && unique (l.map observationId evidence.observations)
+    && compatible (l.length spec.predicates + 1) a.predicate spec.predicates evidence.observations
+    && observe (l.length spec.predicates + 1) a.predicate spec.predicates evidence.observations);
+
+evidenceFor :: Text -> e.Evidence -> Bool = id evidence => evidence.acceptance == id;
+
+-- Only the most recent entry for an obligation counts: a later failing or
+-- differently bound run must not be satisfied by an earlier pass.
+obligationIssueOf :: s.Spec -> e.Execution -> s.Acceptance -> List Text
+  = spec execution a => (issue (t.join "" { "E_EVIDENCE:"; a.id; })
+    (not a.mandatory || match l.find (evidenceFor a.id) (l.reverse execution.evidence) {
+      | #none => false;
+      | #some (evidence) => bound spec execution a evidence;
+    }));
+
+completion :: s.Spec -> e.Execution -> List Text
+  = spec execution => l.flatten {
+    structure spec execution.gates;
+    issue "E_NOT_READY" execution.ready;
+    issue "E_APPROVAL" execution.approved;
+    l.flatten (l.map (obligationIssueOf spec execution) spec.acceptance);
+  };
+
+report :: List Text -> Text = errors => t.join "\n" errors;
+{ structure =; projection =; observe =; compatible =; bound =; completion =; report =; }

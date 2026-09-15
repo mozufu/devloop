@@ -1,0 +1,9 @@
+{
+  formatVersion = 1;
+  name = "devloop_dev_spec";
+  compilerCompatibility = "0.1.0";
+  modules = [
+    { name = "schema"; path = "schema.zt"; };
+  ];
+  dependencies = [];
+}

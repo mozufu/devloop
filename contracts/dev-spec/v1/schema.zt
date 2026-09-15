@@ -1,0 +1,11 @@
+Value :: type { kind : Text; intValue : Int; boolValue : Bool; textValue : Text; };
+Observation :: type { id : Text; value : Value; };
+Predicate :: type {
+  id : Text; kind : Text; observation : Text; expected : Value;
+  lower : Int; upper : Int; lowerInclusive : Bool; upperInclusive : Bool;
+  members : List Text;
+};
+Acceptance :: type { id : Text; rationale : Text; gate : Text; mode : Text; mandatory : Bool; predicate : Text; };
+Requirement :: type { id : Text; statement : Text; acceptance : List Text; };
+Spec :: type { schema : Text; problem : Text; scope : List Text; nonGoals : List Text; requirements : List Requirement; predicates : List Predicate; acceptance : List Acceptance; };
+{ Value =; Observation =; Predicate =; Acceptance =; Requirement =; Spec =; }
