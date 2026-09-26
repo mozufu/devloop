@@ -16,7 +16,7 @@ release. Release verification and artifact SHA256s belong in the release notes.
 - myque-gh 0.2.0.0 when using GitHub projection. Qualified against
   mozufu/myque-gh v0.2.0.0, commit
   `376fe90742c11bc0a60236ad327a769dac2b9e13`.
-- Zutai exact upstream revision `9026fcff5f12e7b2377c25b3d389c2eb06d98e5a`,
+- Zutai exact upstream revision `b667e3c5018e69a3f8e39948a73a6c57c514de6e`,
   <https://github.com/iceice666/zutai>. Rust edition 2024 toolchain; LLVM `llc`
   and `clang` supporting the host native target. The compiler executable alone
   is insufficient: ship/install its matching stdlib and runtime archive.
@@ -25,7 +25,7 @@ From an independent directory, not a product checkout:
 
 ```sh
 git clone https://github.com/iceice666/zutai zutai-toolchain
-git -C zutai-toolchain checkout 9026fcff5f12e7b2377c25b3d389c2eb06d98e5a
+git -C zutai-toolchain checkout b667e3c5018e69a3f8e39948a73a6c57c514de6e
 cargo install --locked --path zutai-toolchain/crates/cli
 cargo build --release --manifest-path zutai-toolchain/Cargo.toml -p zutai-rt
 export ZUTAI_STDLIB_ROOT="$PWD/zutai-toolchain/stdlib"

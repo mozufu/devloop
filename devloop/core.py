@@ -12,7 +12,7 @@ import yaml
 PROFILE = "fenced-zti/v1"
 SCHEMA = "dev-spec/v1"
 VERSION = "devloop-helpers/v1"
-PIN = "9026fcff5f12e7b2377c25b3d389c2eb06d98e5a"
+PIN = "b667e3c5018e69a3f8e39948a73a6c57c514de6e"
 
 class Refusal(Exception):
     pass

@@ -7,6 +7,6 @@ description = "Atom-preserving admission and inert decoding for devloop"
 repository = "https://github.com/iceice666/devloop"
 
 [dependencies]
-zutai-eval = { git = "https://github.com/iceice666/zutai", rev = "9026fcff5f12e7b2377c25b3d389c2eb06d98e5a" }
-zutai-im = { git = "https://github.com/iceice666/zutai", rev = "9026fcff5f12e7b2377c25b3d389c2eb06d98e5a", features = ["syntax"] }
+zutai-eval = { git = "https://github.com/iceice666/zutai", rev = "b667e3c5018e69a3f8e39948a73a6c57c514de6e" }
+zutai-im = { git = "https://github.com/iceice666/zutai", rev = "b667e3c5018e69a3f8e39948a73a6c57c514de6e", features = ["syntax"] }
 serde_json = "1"
